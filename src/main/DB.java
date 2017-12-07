@@ -28,6 +28,7 @@ public class DB {
 	public DB() {
 		try {
 			String url = System.getenv().get("AH_DB_PATH");
+			//System.out.println(url);
 			Class.forName("org.sqlite.JDBC");
 			conn = DriverManager.getConnection(url);
 			stmt = conn.createStatement();
@@ -91,8 +92,8 @@ public class DB {
     public Facility[] getFacilityByZip(String zip) throws SQLException {
 		
 		String sql = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s from Facility " +
-				"LEFT JOIN Review LEFT JOIN Review_Insurance WHERE " + 
-				"%s = %s AND %s = %s AND %s = '%s' ORDER BY %s, %s",
+				"LEFT JOIN Review ON %s = %s LEFT JOIN Review_Insurance ON %s = %s " + 
+				"WHERE %s = '%s' ORDER BY %s, %s",
 				// Fields from Facility
 				F_ID, F_NAME1, F_NAME2, F_STREET1, F_STREET2, F_ZIP,
 				// Fields from Review
@@ -107,14 +108,14 @@ public class DB {
 				// Order by
 				F_ID, R_REVIEW_ID
 				);
-		System.out.println(sql);
+		//System.out.println(sql);
 		ArrayList<Facility> facilities = new ArrayList<>();
 		Facility cur_f = null;
 		Review cur_r = null;
 		
 		ResultSet rs = query(sql);
 		while(rs.next()) {
-			int f_id = rs.getInt(F_ID);
+			int f_id = rs.getInt("id");
 			if(cur_f == null || cur_f.id != f_id) {
 				cur_f = new Facility();
 				cur_f.id = f_id;
@@ -122,14 +123,14 @@ public class DB {
 				cur_r = null;
 				facilities.add(cur_f);
 			}
-			cur_f.id = rs.getInt(F_ID);
-			cur_f.name1 = rs.getString(F_NAME1);
-			cur_f.name2 = rs.getString(F_NAME2);
-			cur_f.street1 = rs.getString(F_STREET1);
-			cur_f.street2 = rs.getString(F_STREET2);
-			cur_f.zip = rs.getString(F_ZIP);
+			cur_f.id = rs.getInt("id");
+			cur_f.name1 = rs.getString("name1");
+			cur_f.name2 = rs.getString("name2");
+			cur_f.street1 = rs.getString("street1");
+			cur_f.street2 = rs.getString("street2");
+			cur_f.zip = rs.getString("zip");
 
-			Integer r_id = rs.getInt(R_REVIEW_ID);
+			Integer r_id = rs.getInt("review_id");
 			r_id = rs.wasNull() ? null : r_id;
 			if(r_id != null) {
 				if(cur_r == null || cur_r.reviewId != r_id) {
@@ -140,21 +141,21 @@ public class DB {
 					cur_f.reviews.add(cur_r);
 				}
 
-				cur_r.rating = rs.getInt(R_RATING);
-				cur_r.text = rs.getString(R_TEXT);
+				cur_r.rating = rs.getInt("rating");
+				cur_r.text = rs.getString("text");
 				cur_r.text = rs.wasNull() ? null : cur_r.text;
-				cur_r.costPerMonth = rs.getLong(R_COST_PER_MONTH);
+				cur_r.costPerMonth = rs.getDouble("cost_per_month");
 				cur_r.costPerMonth = rs.wasNull() ? null : cur_r.costPerMonth;
-				cur_r.role = rs.getString(R_ROLE);
+				cur_r.role = rs.getString("role");
 				cur_r.role = rs.wasNull() ? null : cur_r.role;
-				cur_r.longestTimeSober = rs.getString(R_LONGEST_TIME_SOBER);
+				cur_r.longestTimeSober = rs.getString("longest_time_sober");
 				cur_r.longestTimeSober = rs.wasNull() ? null : cur_r.longestTimeSober;
-				cur_r.drugDealers = rs.getBoolean(R_DRUG_DEALERS);
+				cur_r.drugDealers = rs.getBoolean("drug_dealers");
 				cur_r.drugDealers = rs.wasNull() ? null : cur_r.drugDealers;
-				cur_r.employedSince = rs.getBoolean(R_EMPLOYED_SINCE);
+				cur_r.employedSince = rs.getBoolean("employed_since");
 				cur_r.employedSince = rs.wasNull() ? null : cur_r.employedSince;
 				
-				String insurance = rs.getString(RI_INSURANCE_ID);
+				String insurance = rs.getString("insurance_id");
 				insurance = rs.wasNull() ? null : insurance;
 				if(insurance != null) {
 					cur_r.insurances.add(insurance);
@@ -168,6 +169,10 @@ public class DB {
 	
     public String toSql(Boolean b) {
     	return b == null ? "Null" : (b ? "True" : "False");
+    }
+    
+    public String toSql(Double b) {
+    	return b == null ? "Null" : b.toString();
     }
     
     public String toSql(Integer i) {
