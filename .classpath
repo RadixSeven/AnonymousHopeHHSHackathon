@@ -19,15 +19,25 @@
 			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/ALL/eclipse/workspace/AnonymousHope/WebContent/WEB-INF/lib/gmapsz.jar"/>
-	<classpathentry kind="lib" path="C:/ALL/eclipse/workspace/AnonymousHope/WebContent/WEB-INF/lib/zcommon.jar"/>
-	<classpathentry kind="lib" path="C:/ALL/eclipse/workspace/AnonymousHope/WebContent/WEB-INF/lib/zel.jar"/>
-	<classpathentry kind="lib" path="C:/ALL/eclipse/workspace/AnonymousHope/WebContent/WEB-INF/lib/zhtml.jar"/>
-	<classpathentry kind="lib" path="C:/ALL/eclipse/workspace/AnonymousHope/WebContent/WEB-INF/lib/zk.jar"/>
-	<classpathentry kind="lib" path="C:/ALL/eclipse/workspace/AnonymousHope/WebContent/WEB-INF/lib/zkbind.jar"/>
-	<classpathentry kind="lib" path="C:/ALL/eclipse/workspace/AnonymousHope/WebContent/WEB-INF/lib/zk-bootstrap.jar"/>
-	<classpathentry kind="lib" path="C:/ALL/eclipse/workspace/AnonymousHope/WebContent/WEB-INF/lib/zkplus.jar"/>
-	<classpathentry kind="lib" path="C:/ALL/eclipse/workspace/AnonymousHope/WebContent/WEB-INF/lib/zul.jar"/>
-	<classpathentry kind="lib" path="C:/ALL/eclipse/workspace/AnonymousHope/WebContent/WEB-INF/lib/zweb.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/bsh.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/commons-codec.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/commons-fileupload.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/commons-io.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/flashchart.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/gmapsz.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/sapphire.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/silvertail.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/slf4j-api.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/slf4j-jdk14.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/zcommon.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/zel.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/zhtml.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/zk-bootstrap.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/zk.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/zkbind.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/zkplus.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/zul.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/zweb.jar"/>
+	<classpathentry kind="lib" path="org.eclipse.jdt.annotation_2.1.100.v20170511-1408.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
