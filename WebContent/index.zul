@@ -1,0 +1,25 @@
+<?page title="Anonymous Hope"?>
+<window title="Search" border="normal" width="100pc">
+	<vbox>
+		<hbox>
+			<textbox width="200px" />
+			<button>Search</button>
+		</hbox>
+		<html>
+			<h4>Is this really safe and anonymous?</h4>
+			<p>
+				Yes. You could be looking for a friend. You could be a
+				provider. We don't keep any information about you.
+			</p>
+		</html>
+
+		<hbox>
+			<label value="Zipcode: " />
+			<combobox id="combo" autodrop="true" buttonVisible="false" />
+			<zscript><![CDATA[
+        ListModel dictModel= new SimpleListModel(data.Dictionary.getDirectory());
+        combo.setModel(dictModel);
+    ]]></zscript>
+		</hbox>
+	</vbox>
+</window>
