@@ -21,8 +21,8 @@ public class Review {
 	@Nullable public String text;
 	/** Insurances specifically listed in the review ... Note that not listing an insurance does not mean it was not received... */
 	@NonNull public ArrayList<String> insurances;
-	/** Cost per month of the treatment received by the patient in cents per month */
-	@Nullable public Long costPerMonth;
+	/** Cost per month of the treatment received by the patient in dollars per month */
+	@Nullable public Double costPerMonth;
 	/** The role of the person giving the rating */
 	@Nullable public String role;
 	/** Enumerated type for longest time sober */
