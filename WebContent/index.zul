@@ -1,25 +1,60 @@
+<?import java.util.ArrayList?>
 <?page title="Anonymous Hope"?>
 <window title="Search" border="normal" width="100pc">
 	<vbox>
 		<hbox>
-			<textbox width="200px" />
-			<button>Search</button>
-		</hbox>
-		<html>
-			<h4>Is this really safe and anonymous?</h4>
-			<p>
-				Yes. You could be looking for a friend. You could be a
-				provider. We don't keep any information about you.
-			</p>
-		</html>
-
-		<hbox>
 			<label value="Zipcode: " />
-			<combobox id="combo" autodrop="true" buttonVisible="false" />
+			<combobox id="cboZip" autodrop="true" buttonVisible="false" />
 			<zscript><![CDATA[
-        ListModel dictModel= new SimpleListModel(data.Dictionary.getDirectory());
-        combo.setModel(dictModel);
+        ListModel dictModel= new SimpleListModel(main.DB.getInstance().allzips());
+        cboZip.setModel(dictModel);
     ]]></zscript>
+			<button id="cmdSearch" onClick="search()">Search</button>
 		</hbox>
+		
+		<grid id="gridResults" visible="false">
+			<auxhead>
+				<auxheader colspan="4"
+					label="Facilities for this zip code" />
+			</auxhead>
+			<columns>
+				<column hflex="5">Language</column>
+				<column hflex="6">Contributor</column>
+				<column hflex="3">Charset</column>
+				<column hflex="4">Comment</column>
+			</columns>
+			<rows sclass="narrow">
+				<row>
+					<label value="Arabic (ar)" />
+					<label value="Ayman Elgharabawy" />
+					<label value="iso-8859-6" />
+					<textbox />
+				</row>
+				<row>
+					<label value="Hungarian (hu)" />
+					<label value="Andreas Klein" />
+					<label value="iso-8859-2" />
+					<textbox />
+				</row>
+			</rows>
+		</grid>
+
 	</vbox>
+	<zscript>
+	<![CDATA[
+		void search() {
+			String txt = cboZip.getText();
+			if (txt.length() == 5) {
+				data.Facility[] facilities = main.DB.getInstance().getFacilityByZip(txt);
+				if (facilities.length > 0) {
+					gridResults.setVisible(true);
+					for(data.Facility facility: facilities) {
+						
+					}
+				}
+			}
+			
+			
+		}
+		]]></zscript>
 </window>

@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -18,21 +19,32 @@ import data.Review;
  */
 @NonNullByDefault
 public class DB {
-	String url = "jdbc:sqlite:C:/users/compu/Desktop/Test.db";
 	Connection conn;
-	Statement stmt;
+	
+	static DB db;
+	
+	public Statement stmt;
 
 	public DB() {
 		try {
+			String url = System.getenv().get("AH_DB_PATH");
+			Class.forName("org.sqlite.JDBC");
 			conn = DriverManager.getConnection(url);
 			stmt = conn.createStatement();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+	
+	public static DB getInstance() {
+		if (db == null) {
+			db = new DB();
+		}
+		return db;
+	}
 
 	public ResultSet query(String sql) throws SQLException {
-		stmt.execute(sql);
+		db.stmt.execute(sql);
 		return stmt.getResultSet();
 	}
 
@@ -43,7 +55,13 @@ public class DB {
 			res.add(rs.getString(1));
 		return res;
 	}
+	
 
+	public String[] allzips() throws SQLException  {
+		ArrayList<String> zips = strcoldist("Facility", "zip");
+		return zips.toArray(new String[zips.size()]);
+	}
+	
 	public ArrayList<String> strcol(String tbl, String col) throws SQLException {
 		ArrayList<String> res = new ArrayList<String>();
 		ResultSet rs = query(String.format("SELECT %s FROM %s", col, tbl));
@@ -70,7 +88,7 @@ public class DB {
     final String R_DRUG_DEALERS = "Review.drug_dealers";
     final String R_EMPLOYED_SINCE= "Review.employed_since";
 
-    public ArrayList<Facility> getFacilityByZip(String zip) throws SQLException {
+    public Facility[] getFacilityByZip(String zip) throws SQLException {
 		
 		String sql = String.format("SELECT %s, %s, %s, %s, %s, %s from Facility " +
 				"LEFT JOIN Review LEFT JOIN Review_Insurance WHERE " + 
@@ -142,7 +160,7 @@ public class DB {
 				}
 			}
 		}
-		return facilities;
+		return facilities.toArray(new Facility[facilities.size()]);
 	}
 	
 	// add facility (later)
@@ -174,7 +192,7 @@ public class DB {
 	// add review (now)
 	public void addReview(Review review) throws SQLException {
 		// Still need to insert insurance
-		stmt.execute(
+		db.stmt.execute(
 			String.format("INSERT INTO Review (%s) VALUES (%d, %d, %s, %s, %s, %s, %s, %s, %s); ",
 				reviewFields(), review.reviewId, review.facility.id, toSql(review.rating),
 				toSql(review.text), toSql(review.costPerMonth),
@@ -182,7 +200,7 @@ public class DB {
 				toSql(review.drugDealers), toSql(review.employedSince)
 				));
 		for(String insurance: review.insurances) {
-			stmt.execute(
+			db.stmt.execute(
 				String.format("INSERT INTO Review_Insurance (%s, %s) VALUES (%d, %s)",
 						RI_REVIEW_ID, RI_INSURANCE_ID, review, insurance));
 		}
