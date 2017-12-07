@@ -36,5 +36,11 @@
 			<artifactId>jooq</artifactId>
 			<version>3.10.2</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.zkoss.zk/zul -->
+		<dependency>
+			<groupId>org.zkoss.zk</groupId>
+			<artifactId>zul</artifactId>
+			<version>8.5.0</version>
+		</dependency>
 	</dependencies>
 </project>
