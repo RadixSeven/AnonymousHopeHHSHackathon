@@ -1,25 +1,24 @@
 package main;
 
-import java.security.interfaces.RSAKey;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
-
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import data.Facility;
 import data.Review;
 
 /**
  * DB helper written in a real hurry. Tedious code.
  * Replace this with some ORM (perhaps jOOQ).
- * @author ravi
+ * @author ravi, eric
  *
  */
+@NonNullByDefault
 public class DB {
-	String url = "jdbc:sqlite:C:/users/ravi/Desktop/Test.db";
+	String url = "jdbc:sqlite:C:/users/compu/Desktop/Test.db";
 	Connection conn;
 	Statement stmt;
 
@@ -53,19 +52,95 @@ public class DB {
 		return res;
 	}
 	
-	public ArrayList<Facility> getFacilityByZip(String zip) throws SQLException {
-		String sql = String.format("SELECT id, name1, name2, street1, street2, zip from Facility where zip = '%s'", zip);
+	final String F_ID="Facility.id";
+	final String F_NAME1="Facility.name1";
+	final String F_NAME2="Facility.name2";
+	final String F_STREET1="Facility.street1";
+	final String F_STREET2="Facility.street2";
+	final String F_ZIP="Facility.zip";
+    final String RI_REVIEW_ID = "Review_Insurance.review_id";
+    final String RI_INSURANCE_ID = "Review_Insurance.insurance_id";
+    final String R_REVIEW_ID = "Review.review_id";
+    final String R_FACILITY_ID = "Review.facility_id";
+    final String R_RATING = "Review.rating";
+    final String R_TEXT = "Review.text";
+    final String R_COST_PER_MONTH = "Review.cost_per_month";
+    final String R_ROLE= "Review.role";
+    final String R_LONGEST_TIME_SOBER = "Review.longest_time_sober";
+    final String R_DRUG_DEALERS = "Review.drug_dealers";
+    final String R_EMPLOYED_SINCE= "Review.employed_since";
+
+    public ArrayList<Facility> getFacilityByZip(String zip) throws SQLException {
+		
+		String sql = String.format("SELECT %s, %s, %s, %s, %s, %s from Facility " +
+				"LEFT JOIN Review LEFT JOIN Review_Insurance WHERE " + 
+				"%s = %s AND %s = %s AND %s = '%s' ORDER BY %s, %s",
+				// Fields from Facility
+				F_ID, F_NAME1, F_NAME2, F_STREET1, F_STREET2, F_ZIP,
+				// Fields from Review
+				R_REVIEW_ID, R_RATING, R_TEXT, R_COST_PER_MONTH, R_ROLE, R_LONGEST_TIME_SOBER, 
+				R_DRUG_DEALERS, R_EMPLOYED_SINCE,
+				// Fields from Review_Insurance
+				RI_INSURANCE_ID,
+				// Join conditions
+				F_ID, R_FACILITY_ID,
+				R_REVIEW_ID, RI_REVIEW_ID,
+				F_ZIP, zip,
+				// Order by
+				F_ID, R_REVIEW_ID
+				);
 		ArrayList<Facility> facilities = new ArrayList<>();
+		Facility cur_f = null;
+		Review cur_r = null;
+		
 		ResultSet rs = query(sql);
 		while(rs.next()) {
-			Facility facility = new Facility();
-			facility.id = rs.getInt("id");
-			facility.name1 = rs.getString("name1");
-			facility.name2 = rs.getString("name2");
-			facility.street1 = rs.getString("street1");
-			facility.street2 = rs.getString("street2");
-			facility.zip = rs.getString("zip");
-			facilities.add(facility);
+			int f_id = rs.getInt(F_ID);
+			if(cur_f == null || cur_f.id != f_id) {
+				cur_f = new Facility();
+				cur_f.id = f_id;
+				cur_f.reviews = new ArrayList<>();
+				cur_r = null;
+				facilities.add(cur_f);
+			}
+			cur_f.id = rs.getInt(F_ID);
+			cur_f.name1 = rs.getString(F_NAME1);
+			cur_f.name2 = rs.getString(F_NAME2);
+			cur_f.street1 = rs.getString(F_STREET1);
+			cur_f.street2 = rs.getString(F_STREET2);
+			cur_f.zip = rs.getString(F_ZIP);
+
+			Integer r_id = rs.getInt(R_REVIEW_ID);
+			r_id = rs.wasNull() ? null : r_id;
+			if(r_id != null) {
+				if(cur_r == null || cur_r.reviewId != r_id) {
+					cur_r = new Review();
+					cur_r.reviewId = r_id;
+					cur_r.insurances = new ArrayList<>();
+					cur_r.facility = cur_f;
+					cur_f.reviews.add(cur_r);
+				}
+
+				cur_r.rating = rs.getInt(R_RATING);
+				cur_r.text = rs.getString(R_TEXT);
+				cur_r.text = rs.wasNull() ? null : cur_r.text;
+				cur_r.costPerMonth = rs.getLong(R_COST_PER_MONTH);
+				cur_r.costPerMonth = rs.wasNull() ? null : cur_r.costPerMonth;
+				cur_r.role = rs.getString(R_ROLE);
+				cur_r.role = rs.wasNull() ? null : cur_r.role;
+				cur_r.longestTimeSober = rs.getString(R_LONGEST_TIME_SOBER);
+				cur_r.longestTimeSober = rs.wasNull() ? null : cur_r.longestTimeSober;
+				cur_r.drugDealers = rs.getBoolean(R_DRUG_DEALERS);
+				cur_r.drugDealers = rs.wasNull() ? null : cur_r.drugDealers;
+				cur_r.employedSince = rs.getBoolean(R_EMPLOYED_SINCE);
+				cur_r.employedSince = rs.wasNull() ? null : cur_r.employedSince;
+				
+				String insurance = rs.getString(RI_INSURANCE_ID);
+				insurance = rs.wasNull() ? null : insurance;
+				if(insurance != null) {
+					cur_r.insurances.add(insurance);
+				}
+			}
 		}
 		return facilities;
 	}
@@ -89,22 +164,11 @@ public class DB {
     }
     
     
-    public final String INSURANCE_ID = "insurance_id";
-    public final String REVIEW_ID = "review_id";
-    public final String FACILITY_ID = "facility_id";
-    public final String RATING = "rating";
-    public final String TEXT = "text";
-    public final String COST_PER_MONTH = "cost_per_month";
-    public final String ROLE= "role";
-    public final String LONGEST_TIME_SOBER = "longest_time_sober";
-    public final String DRUG_DEALERS = "drug_dealers";
-    public final String EMPLOYED_SINCE= "employed_since";
-    
-    /** Comma-separated list of the fields in the review table */ 
+    /** Comma-separated list of the fields in the review table ... assumes table called "Review" */ 
     private String reviewFields() {
     	return String.format("%s, %s, %s, %s, %s, %s, %s, %s," +
-			"%s", REVIEW_ID, FACILITY_ID, RATING, TEXT, COST_PER_MONTH,
-			ROLE, LONGEST_TIME_SOBER, DRUG_DEALERS, EMPLOYED_SINCE);
+			"%s", R_REVIEW_ID, R_FACILITY_ID, R_RATING, R_TEXT, R_COST_PER_MONTH,
+			R_ROLE, R_LONGEST_TIME_SOBER, R_DRUG_DEALERS, R_EMPLOYED_SINCE);
     }
 
 	// add review (now)
@@ -112,7 +176,7 @@ public class DB {
 		// Still need to insert insurance
 		stmt.execute(
 			String.format("INSERT INTO Review (%s) VALUES (%d, %d, %s, %s, %s, %s, %s, %s, %s); ",
-				reviewFields(), review.reviewId, review.facilityId, toSql(review.rating),
+				reviewFields(), review.reviewId, review.facility.id, toSql(review.rating),
 				toSql(review.text), toSql(review.costPerMonth),
 				toSql(review.role), toSql(review.longestTimeSober),
 				toSql(review.drugDealers), toSql(review.employedSince)
@@ -120,80 +184,7 @@ public class DB {
 		for(String insurance: review.insurances) {
 			stmt.execute(
 				String.format("INSERT INTO Review_Insurance (%s, %s) VALUES (%d, %s)",
-						REVIEW_ID, INSURANCE_ID, review, insurance));
+						RI_REVIEW_ID, RI_INSURANCE_ID, review, insurance));
 		}
-	}
-	
-	
-	public int reviewId;
-	public int facilityId;
-	public Integer rating;
-	public String text;
-	public String[] insurances;
-	public Long costPerMonth;
-	public String role;
-	public String longestTimeSober;
-	public Boolean drugDealers;
-	public Boolean employedSince;
-	
-	// reviews per facility (now)
-	public ArrayList<Review> reviewsByFacilityId(int facilityId) throws SQLException {
-		String sql = String.format("SELECT %s from Facility where facility_id = %d", 
-				reviewFields(), facilityId);
-		ResultSet rs = query(sql);
-		ArrayList<Review> reviews = new ArrayList<Review>();
-		while(rs.next()) {
-			Review r = new Review();
-			r.reviewId = rs.getInt(REVIEW_ID);
-			r.facilityId = rs.getInt(FACILITY_ID);
-			r.rating = rs.getInt(RATING);
-			r.rating = rs.wasNull() ? null : r.rating;
-			r.text = rs.getString(TEXT);
-			r.text = rs.wasNull() ? null : r.text;
-			r.costPerMonth = rs.getLong(COST_PER_MONTH);
-			r.costPerMonth = rs.wasNull() ? null : r.costPerMonth;
-			r.role = rs.getString(ROLE);
-			r.role = rs.wasNull() ? null : r.role;
-			r.longestTimeSober = rs.getString(LONGEST_TIME_SOBER);
-			r.longestTimeSober = rs.wasNull() ? null : r.longestTimeSober;
-			r.drugDealers = rs.getBoolean(DRUG_DEALERS);
-			r.drugDealers = rs.wasNull() ? null : r.drugDealers;
-			r.employedSince = rs.getBoolean(EMPLOYED_SINCE);
-			r.employedSince = rs.wasNull() ? null : r.employedSince;
-			reviews.add(r);
-		}
-		
-		// Create sql string to query for matching ids (to perform the join in memory)
-		Integer[] review_ids = reviews.stream().map(r -> r.reviewId).toArray(size -> new Integer[size]);
-		StringBuilder sb = new StringBuilder(String.format(
-				"SELECT %s, %s FROM Review_Insurance WHERE %s IN (",
-				REVIEW_ID, INSURANCE_ID, REVIEW_ID));
-		boolean hasPrevious = false;
-		for(int rid : review_ids) {
-			if(hasPrevious) {
-				sb.append(",");
-			}
-			sb.append(rid);
-			hasPrevious = true;
-		}
-		sb.append(") ORDER_BY %s;", REVIEW_ID); // I don't use the ordering below but could
-		
-		// Group the insurance response into lists
-		HashMap<Integer, ArrayList<String>> review_insurances = new HashMap<>();
-		rs = query(sb.toString());
-		while(rs.next()) {
-			Integer rid = rs.getInt(REVIEW_ID);
-			if(! review_insurances.containsKey(rid)) {
-				review_insurances.put(rid, new ArrayList<String>());
-			}
-			review_insurances.get(rid).add(rs.getString(INSURANCE_ID));
-		}
-		
-		// Merge the insurances into the review objects
-		for(Review r : reviews) {
-			r.insurances = (String[]) review_insurances.get(r.reviewId).toArray();
-		}
-		
-		return reviews;
 	}
 }
