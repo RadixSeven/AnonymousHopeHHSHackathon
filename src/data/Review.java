@@ -3,12 +3,12 @@ package data;
 public class Review {
 	public int reviewId;
 	public int facilityId;
-	public int rating;
+	public Integer rating;
 	public String text;
 	public String[] insurances;
-	public String costPerMonth;
+	public Long costPerMonth;
 	public String role;
 	public String longestTimeSober;
-	public String drugDealers;
-	public String employedSince;
+	public Boolean drugDealers;
+	public Boolean employedSince;
 }
