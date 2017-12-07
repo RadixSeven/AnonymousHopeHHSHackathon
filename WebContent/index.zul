@@ -11,34 +11,44 @@
     ]]></zscript>
 			<button id="cmdSearch" onClick="search()">Search</button>
 		</hbox>
-		
-		<grid id="gridResults" visible="false">
+		<hbox>
+		<grid id="gridResults" visible="true" width="400px">
 			<auxhead>
 				<auxheader colspan="4"
 					label="Facilities for this zip code" />
 			</auxhead>
 			<columns>
-				<column hflex="5">Language</column>
-				<column hflex="6">Contributor</column>
-				<column hflex="3">Charset</column>
-				<column hflex="4">Comment</column>
+				<column hflex="5">Name</column>
+				<column hflex="6">Rating</column>
+				<column hflex="3">Phone</column>
+				<column hflex="4">County</column>
 			</columns>
 			<rows sclass="narrow">
 				<row>
 					<label value="Arabic (ar)" />
 					<label value="Ayman Elgharabawy" />
 					<label value="iso-8859-6" />
-					<textbox />
-				</row>
-				<row>
-					<label value="Hungarian (hu)" />
-					<label value="Andreas Klein" />
-					<label value="iso-8859-2" />
-					<textbox />
+					<label value="iso-8859-6" />
 				</row>
 			</rows>
 		</grid>
-
+		<box>
+			<vbox>
+				<label>Facility Details</label>
+				<hbox>
+					<label>Name: </label>
+					<label id="lblName" value="111"/>
+				</hbox>
+				<hbox>
+					<label>Rating: </label>
+					<label id="lblRating" value="111"/>
+				</hbox>
+				<hbox>
+					<button>Add Review</button>
+				</hbox>
+			</vbox>
+		</box>
+	</hbox>
 	</vbox>
 	<zscript>
 	<![CDATA[
@@ -46,15 +56,28 @@
 			String txt = cboZip.getText();
 			if (txt.length() == 5) {
 				data.Facility[] facilities = main.DB.getInstance().getFacilityByZip(txt);
+				facilities = main.DB.getInstance().dummyFacilities();
+				System.out.println(facilities.length);
 				if (facilities.length > 0) {
 					gridResults.setVisible(true);
 					for(data.Facility facility: facilities) {
-						
+						Row row = new Row();
+						row.appendChild(new Label("1111"));
+						row.appendChild(new Label("1111"));
+						row.appendChild(new Label("1111"));
+						Button cmdVisit = new Button("Select Facility");
+						cmdVisit.addEventListener("onClick", new controllers.FacilityListener(lblName, facility));
+						row.appendChild(cmdVisit);
+						gridResults.getRows().appendChild(row);
 					}
 				}
 			}
-			
-			
 		}
+		
+		void updateDetails(data.Facility facility) {
+			lblName.setValue(new Random().toString());
+			lblRating.setValue(new Random().toString());
+		}
+		
 		]]></zscript>
 </window>

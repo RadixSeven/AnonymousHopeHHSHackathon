@@ -90,7 +90,7 @@ public class DB {
 
     public Facility[] getFacilityByZip(String zip) throws SQLException {
 		
-		String sql = String.format("SELECT %s, %s, %s, %s, %s, %s from Facility " +
+		String sql = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s from Facility " +
 				"LEFT JOIN Review LEFT JOIN Review_Insurance WHERE " + 
 				"%s = %s AND %s = %s AND %s = '%s' ORDER BY %s, %s",
 				// Fields from Facility
@@ -107,6 +107,7 @@ public class DB {
 				// Order by
 				F_ID, R_REVIEW_ID
 				);
+		System.out.println(sql);
 		ArrayList<Facility> facilities = new ArrayList<>();
 		Facility cur_f = null;
 		Review cur_r = null;
@@ -204,5 +205,15 @@ public class DB {
 				String.format("INSERT INTO Review_Insurance (%s, %s) VALUES (%d, %s)",
 						RI_REVIEW_ID, RI_INSURANCE_ID, review, insurance));
 		}
+	}
+	
+	public Facility[] dummyFacilities() {
+		ArrayList<Facility> facilities = new ArrayList<Facility>();
+		Facility facility = new Facility();
+		facility.id = 1;
+		facility.name1 = "222";
+		facility.zip = "12345";
+		facilities.add(facility);
+		return facilities.toArray(new Facility[facilities.size()]);
 	}
 }
